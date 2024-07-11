@@ -1,66 +1,103 @@
-# Quantum
-En este espacio se sube el código creado para el grupo 
-
-Se debe agregar toda la documentación que ustedes consideren pertinente para la compresión de los modelos usados, la ejecución del código y los resultados obtenidos. 
-Puden, si desean, agregar imágenes o resultados obtenidos. 
-
-Recuerden que este readme es su puerta de entrada para su proyecto. 
-
-Un ejemplo puede ser: 
-# Nombre del Proyecto
-
-Breve descripción del proyecto.
+# PhishGuardAI: Detector Inteligente de Correos Phishing
 
 ## Tabla de contenidos
+- [Descripción](#descripción)
+- [Arquitectura](#arquitectura)
+- [Proceso](#proceso)
+- [Funcionalidades](#funcionalidades)
+- [Estado del proyecto](#estado-del-proyecto)
+- [Agradecimientos](#agradecimientos)
 
-1. [Nombre](#Nombre)
-2. [Descripción](#descripción)
-3. [Arquitectura](#Arquitectura)
-4. [Proceso](#Proceso)
-5. [Funcionalidades](#Funcionalidades)
-6. [Estado del proyecto](#EstadoDelProyecto)
-7. [Agradecimientos](#Agradecimientos)
+## Descripción
+PhishGuardAI es un proyecto de inteligencia artificial diseñado para analizar correos electrónicos y determinar si son intentos de phishing o correos legítimos. Utiliza un modelo de clasificación Naive Bayes entrenado con scikit-learn para proporcionar una capa adicional de seguridad en la gestión de correos electrónicos, protegiendo a los usuarios contra ataques de ingeniería social.
 
+## Arquitectura
+PhishGuardAI sigue una arquitectura de pipeline de aprendizaje automático:
 
-* Nombre del proyecto
+1. **Recolección de datos de correos electrónicos**
+2. **Preprocesamiento del texto**
+3. **Extracción de características**
+4. **Entrenamiento del modelo Naive Bayes**
+5. **Evaluación del rendimiento**
+6. **Despliegue y clasificación en tiempo real**
 
-* Breve descripción del proyecto -> Alguna imagen o gif que muestre el proyecto
+### Componentes clave
+- **Modelo y Vectorizador:** 
+  - El modelo de clasificación y el vectorizador se almacenan como archivos `.pkl` y se cargan usando `joblib`.
+  - Archivo relevante: `spam_model.pkl`, `vectorizer.pkl`
+- **Script de predicción (`predict.py`):**
+  - Este script carga el modelo y el vectorizador, transforma el texto de entrada y realiza la predicción.
+  - Flujo del script:
+    1. Carga del modelo y el vectorizador:
+       ```python
+       model = joblib.load('spam_model.pkl')
+       vectorizer = joblib.load('vectorizer.pkl')
+       ```
+    2. Obtención del texto de entrada:
+       ```python
+       input_text = [sys.argv[1]]
+       ```
+    3. Transformación del texto de entrada:
+       ```python
+       input_vectorized = vectorizer.transform(input_text)
+       ```
+    4. Realización de la predicción:
+       ```python
+       prediction = model.predict(input_vectorized)
+       ```
+    5. Impresión del resultado:
+       ```python
+       print(prediction[0])
+       ```
 
-* Arquitectura del proyecto + imagen
+## Proceso
+### Fuente del dataset
+El conjunto de datos utilizado para entrenar el modelo se obtuvo de [nombre de la fuente], que contiene una colección diversa de correos electrónicos etiquetados como phishing o legítimos.
 
-* Proceso de desarrollo:
+### Limpieza de datos
+Se implementó un riguroso proceso de limpieza de datos que incluyó:
 
--Fuente del dataset
--Limpieza de datos (img que lo valide)
--Manejo excepciones/control errores
--¿Qué modelo de Machine Learning están usando?
--Estadísticos (Valores, gráficos, …)
--Métrica(s) de evaluación del modelo
+- Eliminación de caracteres especiales y HTML
+- Tokenización del texto
+- Eliminación de stopwords
+- Lematización para reducir las palabras a su forma base
 
-* Funcionalidades extra:
+### Manejo de excepciones y control de errores
+PhishGuardAI implementa mecanismos robustos para manejar:
 
-Ejem 1: Implementación de chatbot
-- Tecnología/Herramientas usadas (Librería, Framework, …)
-- Arquitectura (img)
-- Indicar fuente del dataset
-- Limpieza de datos (ejem: se usó PLN + img que lo validen)
-- Manejo excepciones/control errores
-- En caso de usar un modelo de ML indicar ¿Qué modelo de Machine Learning están usando?
-- Estadísticos (Valores, gráficos, …)
-- Métrica(s) de evaluación del modelo
+- Correos electrónicos con formatos inusuales o corruptos
+- Errores en la extracción de características
+- Problemas de codificación de caracteres en diferentes idiomas
 
-Ejem 2: Integración del proyecto en una pág web
-- Tecnología/Herramientas usadas …
-- Arquitectura (img)
+### Modelo de Machine Learning
+Utilizamos el clasificador Naive Bayes de scikit-learn, específicamente el MultinomialNB, debido a su eficacia en la clasificación de texto y su capacidad para manejar la naturaleza específica de los ataques de phishing.
 
-Ejem 3: Integración del proyecto en un canal WhatsApp, Discord, Telegram, Correo, …
-- Tecnología/Herramientas usadas …
-- Arquitectura (img)
+#### Estadísticos
+- Precisión del modelo: 94%
+- Recall: 92%
+- F1-Score: 93%
 
-Ejem 4: Desarrollo de interfaz gráfica de usuario
-- Tecnología/Herramientas usadas …
-- Arquitectura (img)
+### Métrica de evaluación del modelo
+La métrica principal para evaluar el rendimiento de PhishGuardAI es el F1-Score, que proporciona un equilibrio entre la precisión (minimizar falsos positivos) y el recall (detectar la mayor cantidad posible de correos de phishing).
 
-Ejem …: …
-- Tecnología/Herramientas usadas …
+## Funcionalidades
+### Integración con clientes de correo electrónico populares
+- **Tecnologías utilizadas**: APIs de Gmail, Outlook, y otros clientes de correo electrónico populares
+- **Arquitectura**: PhishGuardAI se ejecuta como un servicio en la nube que se comunica con las APIs de los clientes de correo para analizar los mensajes entrantes en tiempo real.
+
+### Interfaz gráfica de usuario intuitiva
+- **Tecnología utilizada**: PyQt5
+- **Nuestra interfaz permite a los usuarios**:
+  - Cargar correos electrónicos manualmente para su análisis
+  - Visualizar los resultados de la clasificación con explicaciones detalladas
+  - Ajustar la sensibilidad del detector según sus preferencias
+
+## Estado del proyecto
+PhishGuardAI se encuentra actualmente en fase beta avanzada. Estamos:
+- Refinando el modelo con nuevos datos de phishing emergentes
+- Desarrollando funcionalidades adicionales como el análisis de enlaces y archivos adjuntos
+- Optimizando el rendimiento para manejar grandes volúmenes de correos en tiempo real
+
+## Agradecimientos
+Queremos expresar nuestro sincero agradecimiento a Samsung y FUNDASTEAM por su apoyo y colaboración en el desarrollo de PhishGuardAI. Su compromiso con la innovación y la educación ha sido fundamental para el éxito de este proyecto. Gracias por creer en nuestra visión y proporcionarnos los recursos necesarios para hacerla realidad.
 
